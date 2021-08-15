@@ -54,7 +54,9 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'crop/templates/',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,7 +121,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Static DIR setting for files inside projects
+STATICFILES_DIRS = [
+    BASE_DIR / "crop/static/",
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+IMG_URL = BASE_DIR / 'crop/static/data'
