@@ -5,10 +5,56 @@
 {% load static %}
 <div class="container">
 	<div class="row">
-		<img src="{% static 'data/sentinel-2a-tile-7680x-10240y/timeseries/7680-10240-TCI-2016-12-22.png' %}" alt="My image">
+		<div class="col">
+			<img src="{% static 'data/sentinel-2a-tile-7680x-10240y/timeseries/7680-10240-TCI-2016-12-22.png' %}" alt="My image" width="400" height="400">
+		</div>
+		<div class="col">
+			<img src="{% static 'media/result1.png' %}" width="400" height="400" alt="My image">
+		</div>
+		<div class="col">
+			<img src="{% static 'media/result2.png' %}" width="400" height="400" alt="My image">
+		</div>	
 	</div>
-	<div>
-		<img src="{% static 'crop/result1.png' %}" alt="My image">
+	<div class="row">
+		<div class="col">
+			<img src="{% static 'media/result3.png' %}" width="400" height="400" alt="My image">
+		</div>
+		<div class="col">
+			<img src="{% static 'media/result4.png' %}" width="400" height="400" alt="My image">
+		</div>
+		<div class="col">
+			<img src="{% static 'media/result5.png' %}" width="400" height="400" alt="My image">
+		</div>
+		
 	</div>
+
+	<div class="row">
+		<div class="col">
+			<img src="{% static 'media/result6.png' %}" width="400" height="400" alt="My image">
+		</div>
+		<div class="col">
+			<img src="{% static 'media/result7.png' %}" width="400" height="400" alt="My image">
+		</div>
+		<div class="col">
+			<img src="{% static 'media/result8.png' %}" width="400" height="400" alt="My image">
+		</div>
+		
+	</div>
+
+
+		<div class="row">
+		<div class="col">
+			<img src="{% static 'media/result9.png' %}" width="400" height="400" alt="My image">
+		</div>
+		<div class="col">
+			<img src="{% static 'media/result10.png' %}" width="400" height="400" alt="My image">
+		</div>
+		<div class="col">
+			<img src="{% static 'media/result11.png' %}" width="400" height="400" alt="My image">
+		</div>
+		
+	</div>
+
+		
 </div>	
 {% endblock %}

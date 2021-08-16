@@ -134,3 +134,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 IMG_URL = BASE_DIR / 'crop/static/data/'
 
 MEDIA_PATH = BASE_DIR / 'crop/static/media/'
+
+STATIC_PATH = BASE_DIR /'crop/static'
