@@ -4,3 +4,4 @@ WIL Project for Case Studies in Data Science Unit
 Group Members:
 Natasha Galea s3540515@student.rmit.edu.au
 Matthew Gunadi s3740473@student.rmit.edu.au
+Simon karumbi s3455453@student.rmit.edu.au
