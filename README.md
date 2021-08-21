@@ -13,9 +13,10 @@ As a fertiliser company I want to be able to know which specific areas in the Pr
 
 ### S3 Bucket
 s3://goodcropbadcrop\
+
 user: goodcropbadcrop\
 ACCESSKEY: AKIAZNPQWOPGFSECAK75\
-SECRETKEY: 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
+SECRETKEY: phs1BVjbZcC2QS7fbiDQJ1Fs7bfjjDQQgS3KRYgb\
 
-### Satellite Data
-s3://goodcropbadcrop/satellite_data
+s3://goodcropbadcrop/satellite-data/\
+s3://goodcropbadcrop/weather-data/
