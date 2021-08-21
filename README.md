@@ -17,7 +17,7 @@ s3://goodcropbadcrop
 ### IAM Account
 user: goodcropbadcrop\
 ACCESSKEY: AKIAZNPQWOPGFSECAK75\
-SECRETKEY: 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\
+SECRETKEY: phs1BVjbZcC2QS7fbiDQJ1Fs7bfjjDQQgS3KRYgb
 
 ### Datasets
 s3://goodcropbadcrop/satellite-data/\
