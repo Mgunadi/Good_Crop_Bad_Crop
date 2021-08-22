@@ -1,3 +1,8 @@
 venv/
 env/
+	
+model/weather/data/rainfall/*
+model/weather/data/maxtemp/*
+model/weather/data/mintemp/*
+
 **/.DS_Store
