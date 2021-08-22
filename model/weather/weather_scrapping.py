@@ -13,6 +13,8 @@ import json
 # http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=033255
 # http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=136&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=033268
 # http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=136&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=033268
+# http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=033002
+# http://www.bom.gov.au/jsp/ncc/cdio/weatherData/av?p_nccObsCode=122&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=033301
 BASE_URL = 'http://www.bom.gov.au'
 
 # Don't remove this header it's to bypass!!
@@ -26,6 +28,7 @@ headers = {
 }
 AREA_CODE = '033'
 
+# temp is the type 0 is max temp, 1 is min temp, 2 is rainfall
 def get_url(temp: int, number: str):
     code = 0 
     if temp == 0:
@@ -37,8 +40,9 @@ def get_url(temp: int, number: str):
     return f'{BASE_URL}/jsp/ncc/cdio/weatherData/av?p_nccObsCode={code}&p_display_type=dailyDataFile&p_startYear=&p_c=&p_stn_num=033{number}'
 
 
-def get_file(ID: str):
-    url = get_url(2, ID)
+# ID is the station ID, x is the type rainfall / max temp / min temp
+def get_file(ID: str, x: int):
+    url = get_url(x, ID)
     r = requests.get(url, headers=headers)
     soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
 
@@ -56,29 +60,13 @@ def get_file(ID: str):
         pattern = "^Number: +(\d+).*$"
         match = re.match(pattern,ID.text)
         ID = '0'+match.group(1)
-        # print(latitude)
-        # print(longitude)
-        # print(ID)
+
         
         data = {}
         data['statiod_id'] = ID
         data['latitude'] = latitude
         data['longitude'] = longitude
 
-        # Download url is in the 2nd <li>
-        # <ul class="downloads">
-        #   <li>
-        #   <!--Data:--> 
-        #       <a href="/tmp/cdio/IDCJAC0011_033327_2021.zip" title="Data file for selected year of daily minimum temperature">1 year of data</a>
-        #   </li>
-        #   <li>
-        #       <a href="/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&amp;p_stn_num=033327&amp;p_c=-222227429&amp;p_nccObsCode=123&amp;p_startYear=2021" title="Data file for daily minimum temperature data for all years">All years of data</a></li>
-        #   <li>
-        #       <a href="/tmp/cdio/IDCJAC0011_033327_2021.pdf"><abbr title="Portable Document Format file of selected year">PDF</abbr></a><
-        #   /li>
-        # </ul>
-
-        # Download Rainfall File
 
         # Filter to get url for donwload
         ul = soup.find("ul", class_= "downloads")
@@ -108,89 +96,178 @@ def get_file(ID: str):
 
             # Check whether the data has year 0ver 2016
             if len(filter_data.index) > 0:
-                # This chunk code for Download Max Temp FILE
-                
-                url = get_url(0, ID)
-
-                r = requests.get(url, headers=headers)
-                soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
-
-                latitude = soup.find("div", {"id": "latitude"})
-                if latitude != None:
-                # Filter to get url for donwload
-                    ul = soup.find("ul", class_= "downloads")
-                    if ul != None:
-                        a = ul.select('ul > li')[1].select('li > a')[0]
-                        download_url = a['href']
-                        # print(download_url)
-                        download_url = BASE_URL+download_url
-
-                        # Download the file
-                        req = requests.get(download_url, headers=headers)
-                        zip_file = ZipFile(BytesIO(req.content))
-                        files = zip_file.namelist()
-                        zip_file.extractall()
-
-                        # READ THE FILE & FIlTER
-                        with open(files[0], 'r') as csvfile:
-                            df2 = pd.read_csv(csvfile)
-                            filter_data2 = df2[df2['Year'] >= 2016] 
-                            
-                        if len(filter_data2.index) > 0:
-                            # print(filter_data2.head())
-                            filter_data = filter_data.merge(filter_data2, how='inner', on=['Bureau of Meteorology station number', 'Year', 'Month', 'Day'])
-                        # REMOVE THE FILE
-                        for file in files:
-                            os.remove(file)
-
-
-
-                url = get_url(1, ID)
-
-                r = requests.get(url, headers=headers)
-                soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
-
-                latitude = soup.find("div", {"id": "latitude"})
-                if latitude != None:
-                # Filter to get url for donwload
-                    ul = soup.find("ul", class_= "downloads")
-                    if ul != None:
-                        a = ul.select('ul > li')[1].select('li > a')[0]
-                        download_url = a['href']
-                        # print(download_url)
-                        download_url = BASE_URL+download_url
-
-                        # Download the file
-                        req = requests.get(download_url, headers=headers)
-                        zip_file = ZipFile(BytesIO(req.content))
-                        files = zip_file.namelist()
-                        zip_file.extractall()
-
-                        # READ THE FILE & FIlTER
-                        with open(files[0], 'r') as csvfile:
-                            df3 = pd.read_csv(csvfile)
-                            filter_data3 = df3[df3['Year'] >= 2016] 
-                            
-                        if len(filter_data3.index) > 0:
-                            # print(filter_data3.head())
-                            filter_data = filter_data.merge(filter_data3, how='inner', on=['Bureau of Meteorology station number', 'Year', 'Month', 'Day'])
-                        # REMOVE THE FILE
-                        for file in files:
-                            os.remove(file)
-
                 # Save the dataframe to file
                 data['col'] = [col for col in filter_data.columns]
                 data['data'] = filter_data.to_dict()
-                path = 'data/'+ID+'.json'
+                path = ''
+                if x==2:
+                    path = 'data/rainfall/'+ID+'.json'
+                elif x==1:
+                    path = 'data/mintemp/'+ID+'.json'
+                else:
+                    path = 'data/maxtemp/'+ID+'.json'
                 with open(path, 'w') as fp:
                     json.dump(data, fp)
 
 
+for y in range(0,3):
+    for i in range(1,400):
+        number = f"{i:03}"
+        print(number)
+        get_file(number, y)
 
-for i in range(1,1000):
-    number = f"{i:03}"
-    print(i)
-    get_file(number)
+
+
+
+# def get_file(ID: str):
+#     url = get_url(2, ID)
+#     r = requests.get(url, headers=headers)
+#     soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
+
+#     latitude = soup.find("div", {"id": "latitude"})
+#     longitude = soup.find("div", {"id": "longitude"})
+#     ID = soup.find("div", {"id": "id"})
+#     if latitude != None and longitude != None:
+#         pattern = "^Lat: +(\d+.\d+).*$"
+#         match = re.match(pattern,latitude.text)
+#         latitude = match.group(1)
+#         pattern = "^Lon: +(\d+.\d+).*$"
+#         match = re.match(pattern,longitude.text)
+#         longitude = match.group(1)
+
+#         pattern = "^Number: +(\d+).*$"
+#         match = re.match(pattern,ID.text)
+#         ID = '0'+match.group(1)
+#         # print(latitude)
+#         # print(longitude)
+#         # print(ID)
+        
+#         data = {}
+#         data['statiod_id'] = ID
+#         data['latitude'] = latitude
+#         data['longitude'] = longitude
+
+#         # Download url is in the 2nd <li>
+#         # <ul class="downloads">
+#         #   <li>
+#         #   <!--Data:--> 
+#         #       <a href="/tmp/cdio/IDCJAC0011_033327_2021.zip" title="Data file for selected year of daily minimum temperature">1 year of data</a>
+#         #   </li>
+#         #   <li>
+#         #       <a href="/jsp/ncc/cdio/weatherData/av?p_display_type=dailyZippedDataFile&amp;p_stn_num=033327&amp;p_c=-222227429&amp;p_nccObsCode=123&amp;p_startYear=2021" title="Data file for daily minimum temperature data for all years">All years of data</a></li>
+#         #   <li>
+#         #       <a href="/tmp/cdio/IDCJAC0011_033327_2021.pdf"><abbr title="Portable Document Format file of selected year">PDF</abbr></a><
+#         #   /li>
+#         # </ul>
+
+#         # Download Rainfall File
+
+#         # Filter to get url for donwload
+#         ul = soup.find("ul", class_= "downloads")
+#         if ul != None:
+#             a = ul.select('ul > li')[1].select('li > a')[0]
+#             download_url = a['href']
+#             # print(download_url)
+#             download_url = BASE_URL+download_url
+
+#             # Download the file
+#             req = requests.get(download_url, headers=headers)
+#             zip_file = ZipFile(BytesIO(req.content))
+#             files = zip_file.namelist()
+#             zip_file.extractall()
+
+#             # READ THE FILE & FIlTER
+#             with open(files[0], 'r') as csvfile:
+#                 df = pd.read_csv(csvfile)
+#                 filter_data = df[df['Year'] >= 2016] 
+
+            
+
+#             # REMOVE THE FILE
+#             for file in files:
+#                 os.remove(file)
+
+
+#             # Check whether the data has year 0ver 2016
+#             if len(filter_data.index) > 0:
+#                 # This chunk code for Download Max Temp FILE
+                
+#                 url = get_url(0, ID)
+
+#                 r = requests.get(url, headers=headers)
+#                 soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
+
+#                 latitude = soup.find("div", {"id": "latitude"})
+#                 if latitude != None:
+#                 # Filter to get url for donwload
+#                     ul = soup.find("ul", class_= "downloads")
+#                     if ul != None:
+#                         a = ul.select('ul > li')[1].select('li > a')[0]
+#                         download_url = a['href']
+#                         # print(download_url)
+#                         download_url = BASE_URL+download_url
+
+#                         # Download the file
+#                         req = requests.get(download_url, headers=headers)
+#                         zip_file = ZipFile(BytesIO(req.content))
+#                         files = zip_file.namelist()
+#                         zip_file.extractall()
+
+#                         # READ THE FILE & FIlTER
+#                         with open(files[0], 'r') as csvfile:
+#                             df2 = pd.read_csv(csvfile)
+#                             filter_data2 = df2[df2['Year'] >= 2016] 
+                            
+#                         if len(filter_data2.index) > 0:
+#                             # print(filter_data2.head())
+#                             filter_data = filter_data.merge(filter_data2, how='inner', on=['Bureau of Meteorology station number', 'Year', 'Month', 'Day'])
+#                         # REMOVE THE FILE
+#                         for file in files:
+#                             os.remove(file)
+
+
+
+#                 url = get_url(1, ID)
+
+#                 r = requests.get(url, headers=headers)
+#                 soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
+
+#                 latitude = soup.find("div", {"id": "latitude"})
+#                 if latitude != None:
+#                 # Filter to get url for donwload
+#                     ul = soup.find("ul", class_= "downloads")
+#                     if ul != None:
+#                         a = ul.select('ul > li')[1].select('li > a')[0]
+#                         download_url = a['href']
+#                         # print(download_url)
+#                         download_url = BASE_URL+download_url
+
+#                         # Download the file
+#                         req = requests.get(download_url, headers=headers)
+#                         zip_file = ZipFile(BytesIO(req.content))
+#                         files = zip_file.namelist()
+#                         zip_file.extractall()
+
+#                         # READ THE FILE & FIlTER
+#                         with open(files[0], 'r') as csvfile:
+#                             df3 = pd.read_csv(csvfile)
+#                             filter_data3 = df3[df3['Year'] >= 2016] 
+                            
+#                         if len(filter_data3.index) > 0:
+#                             # print(filter_data3.head())
+#                             filter_data = filter_data.merge(filter_data3, how='inner', on=['Bureau of Meteorology station number', 'Year', 'Month', 'Day'])
+#                         # REMOVE THE FILE
+#                         for file in files:
+#                             os.remove(file)
+
+#                 # Save the dataframe to file
+#                 data['col'] = [col for col in filter_data.columns]
+#                 data['data'] = filter_data.to_dict()
+#                 path = 'data/'+ID+'.json'
+#                 with open(path, 'w') as fp:
+#                     json.dump(data, fp)
+
+
 
     
 # <html>
