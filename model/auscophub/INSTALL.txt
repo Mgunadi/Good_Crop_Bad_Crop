@@ -1,0 +1,13 @@
+A standard Python setup.py script is provided. 
+
+Use the command 
+    python setup.py install
+to install in standard locations (/usr/local/bin). To nominate non-standard locations,
+use the --prefix option, e.g.
+    python setup.py install --prefix=~/auscophub
+
+If using a non-standard prefix directory, then the prefix/bin/ subdirectory needs to be 
+in your $PATH, and the prefix/lib/pythonX.X/site-packages/ directory needs to be in 
+your $PYTHONPATH
+
+
