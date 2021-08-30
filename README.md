@@ -5,7 +5,6 @@
 Natasha Galea s3540515@student.rmit.edu.au\
 Matthew Gunadi s3740473@student.rmit.edu.au\
 Simon Karumbi s3455453@student.rmit.edu.au\
-Shashika Rathnasinghe s3821913@student.rmit.edu.au\
 Matthew Ariel Wangsit s3859392@student.rmit.edu.au
 
 ### Problem Statement
