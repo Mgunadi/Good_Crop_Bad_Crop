@@ -66,7 +66,7 @@ for g_file in geom_files:
 				station = x_file
 				min_lat = latitude2 - latitude1
 				min_long = longitude2 - longitude1
-	print(g_file+" "+station+" "+str(min_distance))
+	print(g_file+" "+station+" "+str(min_distance)+" km")
 
 	
 # print(geom_files)
