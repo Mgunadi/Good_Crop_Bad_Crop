@@ -48,14 +48,26 @@ def get_file(ID: str, x: int):
 
     latitude = soup.find("div", {"id": "latitude"})
     longitude = soup.find("div", {"id": "longitude"})
+    elevation = soup.find("div", {"id": "elevation"})
+
     ID = soup.find("div", {"id": "id"})
+
     if latitude != None and longitude != None:
         pattern = "^Lat: +(\d+.\d+).*$"
         match = re.match(pattern,latitude.text)
         latitude = match.group(1)
+
         pattern = "^Lon: +(\d+.\d+).*$"
         match = re.match(pattern,longitude.text)
         longitude = match.group(1)
+
+        pattern = "^Elevation: +(\d+).*$"
+        match = re.match(pattern,elevation.text)
+        if(match != None):
+            elevation = match.group(1)
+        else:
+            elevation = "unknown"
+
 
         pattern = "^Number: +(\d+).*$"
         match = re.match(pattern,ID.text)
@@ -66,6 +78,7 @@ def get_file(ID: str, x: int):
         data['statiod_id'] = ID
         data['latitude'] = latitude
         data['longitude'] = longitude
+        data['elevation'] = elevation
 
 
         # Filter to get url for donwload

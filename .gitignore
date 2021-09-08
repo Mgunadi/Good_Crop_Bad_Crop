@@ -4,5 +4,7 @@ env/
 model/weather/data/rainfall/*
 model/weather/data/maxtemp/*
 model/weather/data/mintemp/*
+model/weather/env/
+model/vegetation_index/env/
 
 **/.DS_Store
