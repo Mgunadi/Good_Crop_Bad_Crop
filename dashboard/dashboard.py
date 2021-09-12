@@ -1,6 +1,6 @@
 import dash
-from dash import dcc
-from dash import html
+import dash_core_components as dcc
+import dash_html_components as html
 import plotly.express as px
 import plotly.graph_objects as go
 import boto3
@@ -45,7 +45,7 @@ savi_fig = px.line(
     y=savi
 )
 
-img = io.imread('my_local_image.jpg')
+img = io.imread('current_satellite_image.jpg')
 title = 'The date this image was captured: xx/xx/xx'
 map_fig = px.imshow(
     img,
