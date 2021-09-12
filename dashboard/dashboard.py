@@ -29,7 +29,7 @@ vi_fig = px.line(
     y=gndvi
 )
 
-vi_fig.update_layout(autosize=False, margin=dict(l=0, r=0, b=0, t=0))
+vi_fig.update_layout(autosize=False, height= 300)
 
 img = io.imread('my_local_image.jpg')
 title = 'The date this image was captured: xx/xx/xx' # To show somewhere in the UI to indicate the date that this image comes from
@@ -42,34 +42,50 @@ map_fig.update_layout(autosize=False, margin=dict(l=0, r=0, b=0, t=0))
 app.layout = html.Div(
     dbc.Container([
         dbc.Row([
-            html.H1('Good Crop, Bad Crop')
-        ]),
+            dbc.Col(html.H1('Good Crop, Bad Crop'), width = 12),
+            dbc.Col(html.P('Predicting sugarcane health in Prosperine, Queensland'), width = 12)]),
         dbc.Row([
             dbc.Col(html.H2('Sidebar'), width=4, style={'height': '100%'}),
-            dbc.Col(
+            html.Div([
+                dbc.Col(
                 dbc.Row(
                     dbc.Col(
-                    dcc.Graph(
-                    id='map',
-                    figure=map_fig,
-                    config={
-                        'displayModeBar': False
-                    }), width=8))
+                        html.Div(
+                            dcc.Graph(
+                            id='map',
+                            figure=map_fig,
+                            config={
+                                'displayModeBar': False
+                            })), width=8))
                 ),
-                dbc.Row(
-                    dbc.Col(
-                     dcc.Graph(
-                        id='vi-graph',
-                        className='vi_graphs',
-                        figure=vi_fig,
-                        config={
-                            'displayModeBar': False
-                        }), width = 8
-                    )
-                )
+                dbc.Col(
+                    html.Div(id='chart-container', 
+                    children =
+                        dcc.Graph(
+                            id='vi-graph',
+                            className='vi_graphs',
+                            figure=vi_fig,
+                            config={
+                                'displayModeBar': False
+                            })), width = 8
+                    
+                )])
+            ])
         ])
-    ])
-)
+    )
+
+dbc.Row([dbc.Col(html.Div(html.B('1'), style={'height': '190px'},
+                className='bg-danger'), width=4),
+    dbc.Col(html.Div([
+        dbc.Row([dbc.Col(html.Div(html.B('2'), className='bg-success'))]),
+        dbc.Row([dbc.Col(html.Div(html.B('3'), style={'height': '120px'},
+                className='bg-info'), width=6),
+            dbc.Col(html.Div([
+                dbc.Row([dbc.Col(html.Div(html.B('4'), className='bg-dark badge-dark'))]),
+                dbc.Row([dbc.Col(html.Div(html.B('5'), className='bg-warning'))],
+                className="row mt-3")]), width=6)
+        ], className="row mt-3")]), width=8)
+])
 
 if __name__ == '__main__':
     app.run_server(debug = True)
