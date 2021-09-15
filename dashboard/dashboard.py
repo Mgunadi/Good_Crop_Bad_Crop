@@ -1,6 +1,6 @@
 import dash
-from dash import dcc
-from dash import html
+import dash_core_components as dcc
+import dash_html_components as html
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
@@ -31,7 +31,7 @@ vi_fig = px.line(
 
 vi_fig.update_layout(autosize=False, height= 300)
 
-img = io.imread('my_local_image.jpg')
+img = io.imread('current_satellite_image.jpg')
 title = 'The date this image was captured: xx/xx/xx' # To show somewhere in the UI to indicate the date that this image comes from
 map_fig = px.imshow(img)
 map_fig.update_xaxes(showticklabels=False)
