@@ -1,0 +1,45 @@
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+#container {
+    display: grid;
+    grid-template-columns: 40% 1fr;
+    grid-template-rows: 10% 1fr 35%;
+    padding: 0 120px;
+    height: 100vh;
+}
+
+#header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: baseline;
+    grid-column: 1/4;
+    background-color: brown;
+}
+
+#sidebar {
+    grid-row: 2/3;
+    background-color: gray;       
+}
+
+#map {
+    display: flex;
+    justify-content: center;
+    grid-column: 2/4;
+    grid-row: 2/4;
+    background-color: green;
+    padding: 30px;
+}
+
+#chart-info {
+    background-color: pink;
+}
+
+#chart {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: yellow;}
