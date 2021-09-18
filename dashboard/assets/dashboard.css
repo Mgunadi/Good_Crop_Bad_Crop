@@ -1,0 +1,13 @@
+html, body {
+    margin: 0;
+    height: 100vh;
+}
+
+.container {
+    background-color: darksalmon;
+    height: 100%;
+}
+
+#chart-container {
+    height:100%;
+}
