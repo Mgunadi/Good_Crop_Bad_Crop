@@ -1,14 +1,37 @@
 import dash
-from dash import dcc
-from dash import html
+# from dash import dcc
+# from dash import html
+import dash_core_components as dcc
+import dash_html_components as html
 from skimage import io
 import plotly.express as px
 import random
 
+
 # Instantiating the Dashboard Application
 app = dash.Dash(__name__)
 
+s3 = boto3.resource('s3')
+
+BUCKET_NAME = 'goodcropbadcrop'
+KEY = 'satellite-data/phase-01/data/sentinel-2a-tile-7680x-10240y/timeseries/7680-10240-TCI-2019-08-09.png'
+
+# Outputs image file to current directory
+s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
+
 # Data
+
+
+#KEY2 = 
+# Get crop data from s3 bucket
+#s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
+
+
+
+
+
+
+
 time_range = [x for x in range(48)]
 vi = [random.randint(1, 10) for x in range(48)]
 vi_fig = px.line(
