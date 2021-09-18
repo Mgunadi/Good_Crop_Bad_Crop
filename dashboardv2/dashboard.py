@@ -7,6 +7,7 @@ from skimage import io
 import plotly.express as px
 import random
 
+
 # Instantiating the Dashboard Application
 app = dash.Dash(__name__)
 
@@ -18,8 +19,19 @@ KEY = 'satellite-data/phase-01/data/sentinel-2a-tile-7680x-10240y/timeseries/768
 # Outputs image file to current directory
 s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
 
-
 # Data
+
+
+#KEY2 = 
+# Get crop data from s3 bucket
+#s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
+
+
+
+
+
+
+
 time_range = [x for x in range(48)]
 vi = [random.randint(1, 10) for x in range(48)]
 vi_fig = px.line(
