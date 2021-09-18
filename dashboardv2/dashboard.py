@@ -1,12 +1,29 @@
 import dash
-from dash import dcc
-from dash import html
+#from dash import dcc
+#from dash import html
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_bootstrap_components as dbc
 from skimage import io
 import plotly.express as px
 import random
+import plotly.graph_objects as go
+import boto3
+import pandas as pd
+
+
 
 # Instantiating the Dashboard Application
 app = dash.Dash(__name__)
+
+# Using Amazon S3 for file storage - need to rememeber to move the ~/.aws/credential and config files to the hosting service
+s3 = boto3.resource('s3')
+
+BUCKET_NAME = 'goodcropbadcrop'
+KEY = 'satellite-data/phase-01/data/sentinel-2a-tile-7680x-10240y/timeseries/7680-10240-TCI-2019-08-09.png'
+
+# Outputs image file to current directory
+s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
 
 # Data
 time_range = [x for x in range(48)]
