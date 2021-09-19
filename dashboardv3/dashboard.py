@@ -6,7 +6,7 @@ import dash_html_components as html
 import boto3
 from skimage import io
 import plotly.express as px
-from create_VI_timeseries import create_VI
+from create_VI_timeseries import create_VI_dict
 
 
 # Instantiating the Dashboard Application
@@ -23,7 +23,7 @@ s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
 # Create VI timeseries graph
 # TODO: Currently, just creates plot for NVDI, expand to all VIs
 labels ={"value": "Average", "variable": 'Statistic'}
-VI_dict = create_VI()
+VI_dict = create_VI_dict()
 NDVI = VI_dict['NDVI']
 VI_metric = str(list(VI_dict.keys())[0])
 

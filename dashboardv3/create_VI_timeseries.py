@@ -12,6 +12,7 @@ GREEN = 'B03'
 RED = 'B04'
 NIR = 'B08'
 
+# Create a dictionary for the VI's
 VI_dict = {}
 
 # Function that gets specific image - not currently called upon
@@ -20,12 +21,12 @@ def get_image(x, y, band, date):
     im = image.imread(path)
     return im
 
-# NVDI calculation
-def calculate_NVDI(NIR, RED):
+# NDVI calculation
+def calculate_NDVI(NIR, RED):
     return (NIR - RED) / (NIR + RED)
 
-# ENVDI calcuation
-def calculate_ENVDI(NIR, GREEN, BLUE):
+# ENDVI calcuation
+def calculate_ENDVI(NIR, GREEN, BLUE):
     return ((NIR+GREEN) - (2*BLUE)) / ((NIR+GREEN) + (2*BLUE)) 
 
 # GNDVI calcuation
@@ -46,7 +47,7 @@ def get_partition(image, xStart, yStart, mask):
                 result.append(image[yStart+y, xStart+x])
     return np.array(result)
 
-
+#TODO: Atm we need to supply as input a date-range to this. However, we would like it to use all data, just grouped by year (each series is a growth cycle)
 def get_avg_vegetation_index(vi, X, Y, xStart, yStart, mask, date_range):
     paths = glob.glob(get_tile_path('7680','10240','B01','*'))
     # print(type(paths))
@@ -72,9 +73,9 @@ def get_avg_vegetation_index(vi, X, Y, xStart, yStart, mask, date_range):
         nir = get_wavelength(X,Y,NIR,date)
         
         # TODO: extend to all VI's
-        if vi == 'NVDI':
-            nvdi = calculate_NVDI(nir, red)
-            res = get_partition(nvdi, xStart, yStart, mask)
+        if vi == 'NDVI':
+            NDVI = calculate_NDVI(nir, red)
+            res = get_partition(NDVI, xStart, yStart, mask)
             average = np.average(res)
             sd = np.std(res)
 
@@ -90,8 +91,8 @@ def get_avg_vegetation_index(vi, X, Y, xStart, yStart, mask, date_range):
     return dict
 
 
-# Create dataframe for the VI time series graphs
-def create_NVDI_dataframe():
+# Create dataframe for the VI time series graphs and store it in the VI dictionary
+def create_NDVI_dataframe():
     # Create time series of vegetation index
     xlabels = [] 
     result = []
@@ -103,7 +104,7 @@ def create_NVDI_dataframe():
     # TODO: Create callback function that generates mask when a polygon section of the satellite image is selected
     # mask = get_crop_mask()
     mask = np.ones((20,20))
-    temp = get_avg_vegetation_index('NVDI', X, Y, xStart, yStart, mask, 2)
+    temp = get_avg_vegetation_index('NDVI', X, Y, xStart, yStart, mask, 2)
 
     for i in range(0, len(temp['result'])):
         xlabel2.append(i)
@@ -118,7 +119,7 @@ def create_NVDI_dataframe():
 
 # TODO: Create a dictionary for dataframes of different VIs using a for loop
 #  not just a dataframe for NDVI, 
-def create_VI():
-    create_NVDI_dataframe()
+def create_VI_dict():
+    create_NDVI_dataframe()
     return VI_dict
 
