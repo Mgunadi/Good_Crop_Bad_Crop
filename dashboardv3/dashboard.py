@@ -3,21 +3,15 @@ import dash
 #from dash import html
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_bootstrap_components as dbc
+import boto3
 from skimage import io
 import plotly.express as px
-import random
-import plotly.graph_objects as go
-import boto3
-import pandas as pd
-
-
+from create_VI_timeseries import create_VI
 
 
 # Instantiating the Dashboard Application
 app = dash.Dash(__name__)
 
-# Using Amazon S3 for file storage - need to rememeber to move the ~/.aws/credential and config files to the hosting service
 s3 = boto3.resource('s3')
 
 BUCKET_NAME = 'goodcropbadcrop'
@@ -26,27 +20,18 @@ KEY = 'satellite-data/phase-01/data/sentinel-2a-tile-7680x-10240y/timeseries/768
 # Outputs image file to current directory
 s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
 
-# Data
+# Create VI timeseries graph
+# TODO: Currently, just creates plot for NVDI, expand to all VIs
+labels ={"value": "Average", "variable": 'Statistic'}
+VI_dict = create_VI()
+NDVI = VI_dict['NDVI']
+VI_metric = str(list(VI_dict.keys())[0])
 
-
-#KEY2 = 
-# Get crop data from s3 bucket
-#s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
-
-
-
-
-
-
-
-time_range = [x for x in range(48)]
-vi = [random.randint(1, 10) for x in range(48)]
-vi_fig = px.line(
-    x=time_range,
-    y=vi
-)
+vi_fig = px.line(NDVI, x='Stage', y=NDVI.columns, labels=labels, title=f"{VI_metric} Time Series of selected region")
+#fig.add_scatter()
 vi_fig.update_layout(autosize=True)
 
+# Create Satellite image to display
 title = 'The date this image was captured: xx/xx/xx'
 img = io.imread('current_satellite_image.jpg')
 map_fig = px.imshow(img)
@@ -54,7 +39,7 @@ map_fig.update_xaxes(showticklabels=False)
 map_fig.update_yaxes(showticklabels=False)
 map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
 
-# HTML Components
+# Dashboard Components
 vi_radio = dcc.RadioItems(
     options=[
         {'label': 'Phenological Stage', 'value': 'NDVI'},
