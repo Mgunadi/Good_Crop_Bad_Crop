@@ -10,4 +10,6 @@ dashboardv3/env/
 dashboardv3/data/
 .vscode/
 
+.pyc
+
 **/.DS_Store

@@ -14,6 +14,7 @@ import pandas as pd
 
 
 
+
 # Instantiating the Dashboard Application
 app = dash.Dash(__name__)
 
