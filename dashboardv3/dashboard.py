@@ -1,12 +1,13 @@
 import dash
-from dash import dcc
-from dash import html
-# import dash_core_components as dcc
-# import dash_html_components as html
+#from dash import dcc
+#from dash import html
+import dash_core_components as dcc
+import dash_html_components as html
 import boto3
 from skimage import io
 import plotly.express as px
-import random
+from create_VI_timeseries import create_VI_dict
+
 
 # Instantiating the Dashboard Application
 app = dash.Dash(__name__)
@@ -19,16 +20,18 @@ KEY = 'satellite-data/phase-01/data/sentinel-2a-tile-7680x-10240y/timeseries/768
 # Outputs image file to current directory
 s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
 
+# Create VI timeseries graph
+# TODO: Currently, just creates plot for NVDI, expand to all VIs
+labels ={"value": "Average", "variable": 'Statistic'}
+VI_dict = create_VI_dict()
+NDVI = VI_dict['NDVI']
+VI_metric = str(list(VI_dict.keys())[0])
 
-# Data
-time_range = [x for x in range(48)]
-vi = [random.randint(1, 10) for x in range(48)]
-vi_fig = px.line(
-    x=time_range,
-    y=vi
-)
+vi_fig = px.line(NDVI, x='Stage', y=NDVI.columns, labels=labels, title=f"{VI_metric} Time Series of selected region")
+#fig.add_scatter()
 vi_fig.update_layout(autosize=True)
 
+# Create Satellite image to display
 title = 'The date this image was captured: xx/xx/xx'
 img = io.imread('current_satellite_image.jpg')
 map_fig = px.imshow(img)
@@ -36,7 +39,7 @@ map_fig.update_xaxes(showticklabels=False)
 map_fig.update_yaxes(showticklabels=False)
 map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
 
-# HTML Components
+# Dashboard Components
 vi_radio = dcc.RadioItems(
     options=[
         {'label': 'Phenological Stage', 'value': 'NDVI'},

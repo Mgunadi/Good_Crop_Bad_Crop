@@ -1,10 +1,13 @@
 venv/
 env/
 	
-model/weather/data/rainfall/*
-model/weather/data/maxtemp/*
-model/weather/data/mintemp/*
+model/weather/data/rainfall/
+model/weather/data/maxtemp/
+model/weather/data/mintemp/
 model/weather/env/
 model/vegetation_index/env/
+dashboardv3/env/
+dashboardv3/data/
+.vscode/
 
 **/.DS_Store
