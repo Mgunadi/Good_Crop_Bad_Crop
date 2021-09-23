@@ -83,8 +83,8 @@ def get_VI_DF(X,Y, path):
     dates = get_dates()
 
     result = {}
-    result['x'] = []
-    result['Y'] = []
+    # result['x'] = []
+    # result['Y'] = []
     result['date'] = []
     # BLUE = 'B02'
     # GREEN = 'B03'
@@ -94,7 +94,7 @@ def get_VI_DF(X,Y, path):
     result['B03'] = []
     result['B04'] = []
     result['B08'] = []
-    result['NVDI'] = []
+    result['NDVI'] = []
     result['SAVI'] = []
     result['ENDVI'] = []
     result['GNDVI'] = []
@@ -107,14 +107,21 @@ def get_VI_DF(X,Y, path):
         img = get_image(X,Y,'TCI',date)
         mask = get_mask(X,Y)
         
-        
+        # FOR AVG
+        count = 0 
+        r_avg = 0
+        b_avg = 0
+        g_avg = 0
+        n_avg = 0
+        ndvi_avg = 0
+        endvi_avg = 0
+        gndvi_avg = 0
+        savi_avg = 0
 
         for y in range(0,512):
             for x in range(0,512):
-
                 # Check if the pixel is in mask
                 if (mask[y,x,3] == 255):
-
                     # Check for cloud
                     RGB = img[y,x]
                     if RGB[0] <= 200 and RGB[1] <= 200 and RGB[2] <= 200:
@@ -124,31 +131,67 @@ def get_VI_DF(X,Y, path):
                         b = blue[y,x]
                         n = nir[y,x]
 
-                        nvdi = calculate_NDVI(n,r)
-                        envdi = calculate_ENDVI(n, g, b)
+                        ndvi = calculate_NDVI(n,r)
+                        endvi = calculate_ENDVI(n, g, b)
                         gndvi = calculcate_GNDVI(n, g)
                         savi = calculate_SAVI(n, r, 0.5)
 
-                        result['x'].append(x)
-                        result['Y'].append(y)
+                        r_avg += r
+                        b_avg += b
+                        g_avg += g
+                        n_avg += n
+                        ndvi_avg += ndvi
+                        endvi_avg += endvi
+                        gndvi_avg += gndvi
+                        savi_avg += savi
+                        count +=1
 
-                        result['date'].append(date)
 
-                        result['B04'].append(r)
-                        result['B02'].append(b)
-                        result['B03'].append(g)
-                        result['B08'].append(n)
+                        # result['x'].append(x)
+                        # result['Y'].append(y)
 
-                        result['NVDI'].append(nvdi)
-                        result['SAVI'].append(savi)
-                        result['ENDVI'].append(envdi)
-                        result['GNDVI'].append(gndvi)
+                        # result['date'].append(date)
 
+                        # result['B04'].append(r)
+                        # result['B02'].append(b)
+                        # result['B03'].append(g)
+                        # result['B08'].append(n)
+
+                        # result['NDvI'].append(ndvi)
+                        # result['SAVI'].append(savi)
+                        # result['ENDVI'].append(endvi)
+                        # result['GNDVI'].append(gndvi)
+        # ADD AVERAGE
+        if count !=0:
+            result['date'].append(date)
+            result['B04'].append(r_avg/count)
+            result['B02'].append(b_avg/count)
+            result['B03'].append(g_avg/count)
+            result['B08'].append(n_avg/count)
+
+            result['NDVI'].append(ndvi_avg/count)
+            result['SAVI'].append(savi_avg/count)
+            result['ENDVI'].append(endvi_avg/count)
+            result['GNDVI'].append(gndvi_avg/count)
     df = pd.DataFrame(result)
     save_path = f'{path}result-{X}x-{Y}y'
     df.to_feather(save_path)
                         
 
+
+# TO GENERATE DF
+get_VI_DF('7680', '10240','data/')
+df = pd.read_feather('data/result-7680x-10240y')
+print(df.head(10))
+
+
+# DO NOT REMOVE BELOW FOR TESTING
+# DO NOT REMOVE BELOW FOR TESTING
+
+# for obj in bucket.objects.filter(Prefix='satellite-data/Phase02-DataDelivery/'):
+#     print(obj.key)
+
+# satellite-data/Phase02-DataDelivery/geometries/geo-x9728-y6144.geojson
 
 # picture = io.BytesIO(cont)
 # im = image.imread(picture)
@@ -169,26 +212,7 @@ def get_VI_DF(X,Y, path):
 #     ExpectedBucketOwner='string'
 # )
 # 
-#print(get_image('7680', '10240', 'B01', '2016-12-22'))
 
-# img = get_image('7680', '10240','TCI','2016-12-22')
-# print(img)
-# img = get_mask('7680', '10240')
-# print(img[0,0,3])
 
-get_VI_DF('7680', '10240','data/')
 
-# import os
-# #print(os.getcwd())
-
-# def get_tile_path(x, y, band, date):
-#     path = f'C:\\Users\\Gladiator\\Documents\\Good_Crop_Bad_Crop\\model\\satelite_data\\phase-01\\data\\sentinel-2a-tile-{x}x-{y}y\\timeseries\\{x}-{y}-{band}-{date}.png'
-#     return path
-
-# def get_image(x, y, band, date):
-#     path = get_tile_path(x,y,band,date)
-#     im = image.imread(path)
-#     return im
-
-#print(get_image('7680', '10240', 'B01', '2016-12-22'))
 
