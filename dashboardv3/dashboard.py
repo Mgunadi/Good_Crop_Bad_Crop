@@ -1,4 +1,6 @@
 import dash
+import pillow as PIL
+from PIL import Image
 #from dash import dcc
 #from dash import html
 import dash_core_components as dcc
@@ -35,6 +37,8 @@ vi_fig.update_layout(autosize=True)
 title = 'The date this image was captured: xx/xx/xx'
 img = io.imread('current_satellite_image.jpg')
 map_fig = px.imshow(img)
+overlay = io.imread('sugarcane-region-mask.png')
+map_fig.add_trace(overlay)
 map_fig.update_xaxes(showticklabels=False)
 map_fig.update_yaxes(showticklabels=False)
 map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))

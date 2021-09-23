@@ -83,6 +83,8 @@ def get_avg_vegetation_index(vi, X, Y, xStart, yStart, mask, date_range):
             upper.append(average+(2*sd))
             lower.append(average-(2*sd))
             result.append(res)
+
+        
     dict = {}
     dict['result'] = result
     dict['avg'] = avg
