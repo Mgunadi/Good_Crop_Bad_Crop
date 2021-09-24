@@ -26,14 +26,13 @@ BUCKET_NAME = 'goodcropbadcrop'
 KEY = 'satellite-data/phase-01/data/sentinel-2a-tile-7680x-10240y/timeseries/7680-10240-TCI-2019-08-09.png'
 # Outputs image file to current directory
 # s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
+
 title = 'The date this image was captured: xx/xx/xx'
 img = io.imread('data\\current_satellite_image.jpg')
 map_fig = px.imshow(img)
 map_fig.update_xaxes(showticklabels=False)
 map_fig.update_yaxes(showticklabels=False)
 map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
-
-
 
 
 # UI components
@@ -85,9 +84,12 @@ app.layout = html.Div(id='container',
                                                     html.H2('Field Information',
                                                             style={'text-align': 'center'}
                                                             ),
-                                                    html.P('Select health metric:'),
+                                                    html.P('Select health metric:',
+                                                            style={'font-weight': 'bold'}
+                                                            ),
                                                     vi_radio,
-                                                    html.P('Select the region of interest:'),
+                                                    html.P('Select the region of interest:',
+                                                            style={'font-weight': 'bold'}),
                                                     field_selection
                                                 ],
                                         ),
@@ -103,9 +105,9 @@ app.layout = html.Div(id='container',
 #Callback
 @app.callback(
     Output(component_id='vi--chart', component_property='figure'),
-    Input(component_id='vi--radio', component_property='value')
+    Input(component_id='vi--radio', component_property='value'),
 )
-def update_graph(VI):
+def update_time_series(VI):
     # Read and subset the dataframe
     upper = VI + '_LOWER'
     lower = VI + '_UPPER'
@@ -151,6 +153,27 @@ def update_graph(VI):
                         hovermode="x",
                         autosize=True) 
     return fig
+
+#Callback
+@app.callback(
+    Output(component_id='map-chart', component_property='figure'),
+    Input(component_id='field_selection', component_property='value')
+)
+def update_field(field): 
+    if field == 'Field_1':
+        img = io.imread('data\\current_satellite_image.jpg')
+        #print(img)
+    else:
+        img = io.imread('data\\masked_region.png')
+        #print(img)
+
+    title = 'The date this image was captured: xx/xx/xx'
+    map_fig = px.imshow(img)
+    map_fig.update_xaxes(showticklabels=False)
+    map_fig.update_yaxes(showticklabels=False)
+    map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
+    
+    return map_fig
 
 '''
 https://plotly.com/python/shapes/
