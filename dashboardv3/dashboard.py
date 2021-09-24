@@ -8,7 +8,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import boto3
-from skimage import io
+from skimage import color, io
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
@@ -66,21 +66,25 @@ time_scrub = dcc.Slider(
     max=2026,
     #value=bandwidth_vi_data['date'].min(),
     value=2021,
-    marks={2021: '2021', 2022: '2022', 2023: '2023', 2024: '2024', 2025: '2025'},
-    step=1,
+    marks={2021: {'label': '2021', 'style': {'color': 'yellow', 'font-weight': 'bold'}},  
+            2022: {'label': '2022', 'style': {'color': 'yellow', 'font-weight': 'bold'}}, 
+            2023: {'label': '2023', 'style': {'color': 'yellow', 'font-weight': 'bold'}}, 
+            2024: {'label': '2024', 'style': {'color': 'yellow', 'font-weight': 'bold'}}, 
+            2025: {'label': '2025', 'style': {'color': 'yellow', 'font-weight': 'bold'}}},
+    step=1
 )
 
 map = dcc.Graph(
     id = 'map-chart', 
     figure = map_fig, 
     style = {'height':'100%', 'width':'100%'},
-    config={'displayModeBar': False}
+    config={'displayModeBar': False},
     )
 
 chart = dcc.Graph(
     id = 'vi--chart', 
     #figure = vi_fig, 
-    style = {'height':'90%', 'width':'80%'},
+    style = {'height':'90%', 'width':'80%', 'background-color': 'white'},
     config={'displayModeBar': False}
     )
 
@@ -102,7 +106,9 @@ app.layout = html.Div(id='container',
                                         ),
                                 html.Div(id= 'header2',
                                          children = [ 
-                                                    html.H2('Predicting sugarcane health near Prosperine, Queensland')]
+                                                    html.H2('Predicting sugarcane health near Prosperine, Queensland'),
+                                                    html.Img(src='assets\\sugarcane.png', style={'align': 'right'})
+                                                    ]
                                         ),
                                 html.Div(id = 'sidebar', 
                                         children =[
