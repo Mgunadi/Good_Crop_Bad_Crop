@@ -183,8 +183,7 @@ def get_VI_DF(X,Y, path):
 #get_VI_DF('7680', '10240','data/')
 #df = pd.read_feather('data/result-7680x-10240y')
 #print(df.head(10))
-
-print((get_mask('7680', '10240').shape))
+#print((get_mask('7680', '10240').shape))
 
 
 # DO NOT REMOVE BELOW FOR TESTING
