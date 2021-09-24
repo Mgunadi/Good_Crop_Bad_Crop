@@ -7,6 +7,7 @@ import glob
 import io
 import numpy as np
 import pandas as pd
+import statistics
 
 # Set up import paths
 BUCKET_NAME = 'goodcropbadcrop'
@@ -99,6 +100,23 @@ def get_VI_DF(X,Y, path):
     result['ENDVI'] = []
     result['GNDVI'] = []
 
+    result['B02_UPPER'] = []
+    result['B03_UPPER'] = []
+    result['B04_UPPER'] = []
+    result['B08_UPPER'] = []
+    result['NDVI_UPPER'] = []
+    result['SAVI_UPPER'] = []
+    result['ENDVI_UPPER'] = []
+    result['GNDVI_UPPER'] = []
+
+    result['B02_LOWER'] = []
+    result['B03_LOWER'] = []
+    result['B04_LOWER'] = []
+    result['B08_LOWER'] = []
+    result['NDVI_LOWER'] = []
+    result['SAVI_LOWER'] = []
+    result['ENDVI_LOWER'] = []
+    result['GNDVI_LOWER'] = []
     for date in dates:
         red = get_wavelength(X,Y,RED,date)
         blue = get_wavelength(X,Y,BLUE,date)
@@ -109,14 +127,15 @@ def get_VI_DF(X,Y, path):
         
         # FOR AVG
         count = 0 
-        r_avg = 0
-        b_avg = 0
-        g_avg = 0
-        n_avg = 0
-        ndvi_avg = 0
-        endvi_avg = 0
-        gndvi_avg = 0
-        savi_avg = 0
+        r_avg = []
+        b_avg = []
+        g_avg = []
+        n_avg = []
+        ndvi_avg = []
+        endvi_avg = []
+        gndvi_avg = []
+        savi_avg = []
+
 
         for y in range(0,512):
             for x in range(0,512):
@@ -136,15 +155,25 @@ def get_VI_DF(X,Y, path):
                         gndvi = calculcate_GNDVI(n, g)
                         savi = calculate_SAVI(n, r, 0.5)
 
-                        r_avg += r
-                        b_avg += b
-                        g_avg += g
-                        n_avg += n
-                        ndvi_avg += ndvi
-                        endvi_avg += endvi
-                        gndvi_avg += gndvi
-                        savi_avg += savi
+                        r_avg.append(r)
+                        b_avg.append(b)
+                        g_avg.append(g)
+                        n_avg.append(n)
+                        ndvi_avg.append(ndvi)
+                        endvi_avg.append(endvi)
+                        gndvi_avg.append(gndvi)
+                        savi_avg.append(savi)
                         count +=1
+
+                        # r_avg += r
+                        # b_avg += b
+                        # g_avg += g
+                        # n_avg += n
+                        # ndvi_avg += ndvi
+                        # endvi_avg += endvi
+                        # gndvi_avg += gndvi
+                        # savi_avg += savi
+                        # count +=1
 
 
                         # result['x'].append(x)
@@ -163,26 +192,65 @@ def get_VI_DF(X,Y, path):
                         # result['GNDVI'].append(gndvi)
         # ADD AVERAGE
         if count !=0:
-            result['date'].append(date)
-            result['B04'].append(r_avg/count)
-            result['B02'].append(b_avg/count)
-            result['B03'].append(g_avg/count)
-            result['B08'].append(n_avg/count)
 
-            result['NDVI'].append(ndvi_avg/count)
-            result['SAVI'].append(savi_avg/count)
-            result['ENDVI'].append(endvi_avg/count)
-            result['GNDVI'].append(gndvi_avg/count)
-    df = pd.DataFrame(result)
+            a = sum(r_avg)/count
+            b = sum(b_avg)/count
+            c = sum(g_avg)/count
+            d = sum(n_avg)/count
+            e = sum(ndvi_avg)/count
+            f = sum(savi_avg)/count
+            g = sum(endvi_avg)/count
+            h = sum(gndvi_avg)/count
+            result['date'].append(date)
+            result['B04'].append(a)
+            result['B02'].append(b)
+            result['B03'].append(c)
+            result['B08'].append(d)
+
+            result['NDVI'].append(e)
+            result['SAVI'].append(f)
+            result['ENDVI'].append(g)
+            result['GNDVI'].append(h)
+
+            r_std = statistics.stdev(r_avg)
+            b_std = statistics.stdev(b_avg)
+            g_std = statistics.stdev(g_avg)
+            n_std = statistics.stdev(n_avg)
+            ndvi_std = statistics.stdev(ndvi_avg)
+            endvi_std = statistics.stdev(endvi_avg)
+            gndvi_std = statistics.stdev(gndvi_avg)
+            savi_std = statistics.stdev(savi_avg)
+
+
+            result['B04_UPPER'].append(a+r_std)
+            result['B02_UPPER'].append(b+b_std)
+            result['B03_UPPER'].append(c+g_std)
+            result['B08_UPPER'].append(d+n_std)
+
+            result['NDVI_UPPER'].append(e+ndvi_std)
+            result['SAVI_UPPER'].append(f+savi_std)
+            result['ENDVI_UPPER'].append(g+endvi_std)
+            result['GNDVI_UPPER'].append(h+gndvi_std)
+
+            result['B04_LOWER'].append(a-r_std)
+            result['B02_LOWER'].append(b-b_std)
+            result['B03_LOWER'].append(c-g_std)
+            result['B08_LOWER'].append(d-n_std)
+
+            result['NDVI_LOWER'].append(e-ndvi_std)
+            result['SAVI_LOWER'].append(f-savi_std)
+            result['ENDVI_LOWER'].append(g-endvi_std)
+            result['GNDVI_LOWER'].append(h-gndvi_std)
+        df = pd.DataFrame(result)
     save_path = f'{path}result-{X}x-{Y}y'
     df.to_feather(save_path)
                         
 
 
 # TO GENERATE DF
-get_VI_DF('7680', '10240','data/')
-df = pd.read_feather('data/result-7680x-10240y')
-print(df.head(10))
+# get_VI_DF('7680', '10240','data/')
+# df = pd.read_feather('data/result-7680x-10240y')
+# print(df.head(10))
 
 
 # DO NOT REMOVE BELOW FOR TESTING
