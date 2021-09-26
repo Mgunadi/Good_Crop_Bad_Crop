@@ -127,9 +127,10 @@ app.layout = html.Div(id='container',
                                                     html.Br(), 
                                                     html.P('Forecast into:',
                                                             style={'font-weight': 'bold'}),
-                                                    time_scrub
+                                                    time_scrub,  
                                                 ],
                                         ),
+                                html.Div('Crop health: Good', style={'font-size': '200'}, className='Panel1'),
                                 html.Div(id = 'map', 
                                         children = [map],
                                         style= {'background-color': 'rgb(5, 4, 37)'}
