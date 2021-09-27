@@ -4,10 +4,10 @@ import pandas as pd
 import numpy as np
 import os
 from PIL import Image
-from dash import dcc
-from dash import html
-# import dash_core_components as dcc
-# import dash_html_components as html
+# from dash import dcc
+# from dash import html
+import dash_core_components as dcc
+import dash_html_components as html
 from dash.dependencies import Input, Output
 import boto3
 from skimage import color, io
@@ -113,8 +113,8 @@ app.layout = html.Div(id='container',
                                         ),
                                 html.Div(id= 'header2',
                                          children = [ 
-                                                    html.H2('Predicting sugarcane health near Prosperine, Queensland'),
-                                                    html.Img(src= os.path.join('assets','sugarcane.png'), style={'align': 'right'})
+                                                        html.Div(html.H2('Predicting sugarcane health near Prosperine, Queensland')),
+                                                        html.Div(html.Img(src= os.path.join('assets','sugarcane.png'), style={'align': 'right'}))
                                                     ]
                                         ),
                                 html.Div(id = 'sidebar', 
