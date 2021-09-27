@@ -43,12 +43,11 @@ p {
 
 #header2 {
     padding-top: 5%;
-    padding-left: 18%;
     display: flex;
     flex-direction: row;
     grid-template-columns: 80% 1fr;
     /* justify-content: space-around; */
-    /* justify-content: left; */
+    justify-content: bottom; 
     align-items: baseline;
     grid-column: 2/4;
     background-color: rgb(55, 36, 163);
@@ -56,6 +55,7 @@ p {
 
 #header2 > Div{
     text-align: left;
+    padding-left: 15%;
 }
 
 #sidebar {

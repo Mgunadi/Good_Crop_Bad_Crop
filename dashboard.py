@@ -1,19 +1,21 @@
-from posixpath import join
 import dash
 import pandas as pd
 import numpy as np
 import os
 from PIL import Image
+from plotly.tools import mpl_to_plotly
+import matplotlib.pyplot as plt
 # from dash import dcc
 # from dash import html
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import boto3
-from skimage import color, io
+from skimage import io
 import plotly.express as px
 import plotly.graph_objects as go
-import pandas as pd
+from create_rasters import create_rasters
+import imageio
 
 
 # S3 import implementation for Satellite image
@@ -31,15 +33,39 @@ img_file_name = os.path.join(data_path,'timeseries', '7680-10240-TCI-2019-08-09.
 # Read the binary datafile
 bandwidth_vi_data = pd.read_feather(data_file_name)
 
+
+
 # Instantiating the Dashboard Application
 app = dash.Dash(__name__)
 
-title = 'The date this image was captured: xx/xx/xx'
-img = io.imread(img_file_name)
-map_fig = px.imshow(img)
-map_fig.update_xaxes(showticklabels=False)
-map_fig.update_yaxes(showticklabels=False)
-map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
+# Draw the satellite background
+def create_stl_img(field_no):
+    title = 'The date this image was captured: xx/xx/xx'
+    if field_no == 'Field_2':
+        img = io.imread(img_file_name)
+        print("img 1")
+        print(type(img))
+        print(img)
+        map_fig = px.imshow(img)
+        # map_fig.update_xaxes(showticklabels=False)
+        # map_fig.update_yaxes(showticklabels=False)
+        # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
+    else:
+        img = create_rasters()
+        print("img 2")
+        image2 = imageio.core.util.Array(img)
+        map_fig = px.imshow(image2)
+        print(type(image2))
+        print(image2)
+        #map_fig = plt.figure()
+        #map_fig = map_fig.add_subplot(img)
+        #map_fig = mpl_to_plotly(map_fig)
+        #map_fig.add_trace(px.imshow(img).img[0])
+        # map_fig.update_xaxes(showticklabels=False)
+        # map_fig.update_yaxes(showticklabels=False)
+        # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
+    print(map_fig)
+    return map_fig
 
 
 # UI components
@@ -47,7 +73,7 @@ vi_radio = dcc.RadioItems(
     options=[
         {'label': 'Normalized Difference Vegetation Index', 'value': 'NDVI'},
         {'label': 'Green Normalized Difference Vegetation Index', 'value': 'GNDVI'},
-        {'label': 'Ssoil Adjusted Vegetation Index', 'value': 'SAVI'}
+        {'label': 'Soil Adjusted Vegetation Index', 'value': 'SAVI'}
     ],
     labelStyle={'display': 'flex', 
                 'color': 'white'},
@@ -83,7 +109,7 @@ time_scrub = dcc.Slider(
 
 map = dcc.Graph(
     id = 'map-chart', 
-    figure = map_fig, 
+    figure = create_stl_img('Field_1'), 
     style = {'height':'100%', 'width':'100%'},
     config={'displayModeBar': False},
     )
@@ -206,19 +232,22 @@ def update_time_series(VI):
 )
 
 def update_field(field): 
-    if field == 'Field_1':
-        img = io.imread(img_file_name)
-    else:
-        mask_path = os.path.join(static_img_path, 'masks', 'data/masks/mask-x7168-y10240.png')
-        img = io.imread(mask_path)
+    create_stl_img(field)
+    # if field == 'Field_1':
+    #     img = io.imread(img_file_name)
+    #     title = 'The date this image was captured: xx/xx/xx'
+    #     map_fig = px.imshow(img, title = title)
+    #     map_fig.update_xaxes(showticklabels=False)
+    #     map_fig.update_yaxes(showticklabels=False)
+    #     map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
 
-    title = 'The date this image was captured: xx/xx/xx'
-    map_fig = px.imshow(img)
-    map_fig.update_xaxes(showticklabels=False)
-    map_fig.update_yaxes(showticklabels=False)
-    map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
-    
-    return map_fig
+    # else:
+    #     #mask_path = os.path.join(static_img_path, 'masks', 'data/masks/mask-x7168-y10240.png')
+    #     #img = io.imread(mask_path)
+    #     #img = plt.imshow(create_rasters())
+    #     img = create_rasters()
+    #     map_fig = plt.imshow(img)
+    # return map_fig
 
 '''
 https://plotly.com/python/shapes/
