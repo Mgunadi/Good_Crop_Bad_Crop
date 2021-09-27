@@ -146,7 +146,7 @@ app.layout = html.Div(id='container',
                                         ),
                                 html.Div(id= 'header2',
                                          children = [ 
-                                                        html.Div(html.H2('Predicting sugarcane health near Prosperine, Queensland')),
+                                                        html.Div(html.H2('Predicting sugarcane health near Proserpine, Queensland')),
                                                         html.Div(html.Img(src= os.path.join('assets','sugarcane.png'), style={'align': 'right'}))
                                                     ]
                                         ),
