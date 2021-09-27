@@ -74,8 +74,8 @@ def generate_field_rasters():
             raster = create_vi_raster(mask,ndvi)
             save_image(raster,save_path)
 
-
-generate_field_rasters()
+# UNCOMMENT TO GENERATE
+# generate_field_rasters()
 
 
 
