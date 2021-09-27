@@ -22,7 +22,7 @@ p {
 #container {
     display: grid;
     grid-template-columns: 40% 1fr;
-    grid-template-rows: 18% 1fr 1fr 23%;
+    grid-template-rows: 15% 1fr 12% 38%;
     padding: 0 120px;
     height: 100vh;
     color: black;

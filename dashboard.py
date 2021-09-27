@@ -5,10 +5,10 @@ import os
 from PIL import Image
 from plotly.tools import mpl_to_plotly
 import matplotlib.pyplot as plt
-from dash import dcc
-from dash import html
-# import dash_core_components as dcc
-# import dash_html_components as html
+#from dash import dcc
+#from dash import html
+import dash_core_components as dcc
+import dash_html_components as html
 from dash.dependencies import Input, Output
 import boto3
 from skimage import io
@@ -39,23 +39,17 @@ bandwidth_vi_data = pd.read_feather(data_file_name)
 app = dash.Dash(__name__)
 
 # Draw the satellite background
-def create_stl_img(field_no):
+def create_stl_img(VI_type):
     title = 'The date this image was captured: xx/xx/xx'
-    if field_no == 'Field_1':
-        img = io.imread(img_file_name)
-        print("img 1")
-        print(type(img))
-        print(img)
+    if VI_type == 'NDVI':
+        img = io.imread('NDVI.png')
         map_fig = px.imshow(img)
-        # map_fig.update_xaxes(showticklabels=False)
-        # map_fig.update_yaxes(showticklabels=False)
-        # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
-    else:
-        img = create_rasters()
+    elif VI_type == 'GNDVI':
+        #img = create_rasters()
         # print("img 2")
-        # img = io.imread('NDVI.png')
-        image2 = imageio.core.util.Array(img)
-        map_fig = px.imshow(image2)
+        img = io.imread('GNDVI.png')
+        #image2 = imageio.core.util.Array(img)
+        map_fig = px.imshow(img)
         # print(type(image2))
         # print(image2)
         #map_fig = plt.figure()
@@ -65,21 +59,33 @@ def create_stl_img(field_no):
         # map_fig.update_xaxes(showticklabels=False)
         # map_fig.update_yaxes(showticklabels=False)
         # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
-    print(map_fig)
+    elif VI_type == 'SAVI':
+        img = io.imread('ENDVI.png')
+        map_fig = px.imshow(img)
+    else:
+        img = io.imread(img_file_name)
+        print("img 1")
+        print(type(img))
+        print(img)
+        map_fig = px.imshow(img)
+        # map_fig.update_xaxes(showticklabels=False)
+        # map_fig.update_yaxes(showticklabels=False)
+        # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
     return map_fig
 
 
 # UI components
 vi_radio = dcc.RadioItems(
     options=[
+        {'label': 'Base map', 'value': 'None'},
         {'label': 'Normalized Difference Vegetation Index', 'value': 'NDVI'},
         {'label': 'Green Normalized Difference Vegetation Index', 'value': 'GNDVI'},
         {'label': 'Soil Adjusted Vegetation Index', 'value': 'SAVI'}
     ],
     labelStyle={'display': 'flex', 
                 'color': 'white'},
-    value='NDVI',
-    id= 'vi--radio'
+    value='None',
+    id='vi--radio'
     )  
 
 field_selection = dcc.Dropdown(
@@ -110,7 +116,7 @@ time_scrub = dcc.Slider(
 
 map = dcc.Graph(
     id = 'map-chart', 
-    figure = create_stl_img('Field_2'), 
+    figure = create_stl_img('Default'), 
     style = {'height':'100%', 'width':'100%'},
     config={'displayModeBar': False},
     )
@@ -164,7 +170,8 @@ app.layout = html.Div(id='container',
                                                     time_scrub,  
                                                 ],
                                         ),
-                                html.Div('Crop health: Good', style={'font-size': '200'}, className='Panel1'),
+                                html.Div(
+                                    html.P('Crop health: Good',), style={'font-size': '200'}, className='Panel1'),
                                 html.Div(id = 'map', 
                                         children = [map],
                                         style= {'background-color': 'rgb(5, 4, 37)'}
@@ -178,14 +185,20 @@ app.layout = html.Div(id='container',
 #Callback
 @app.callback(
     Output(component_id='vi--chart', component_property='figure'),
+    Output(component_id='map-chart', component_property='figure'),
     Input(component_id='vi--radio', component_property='value'),
 )
-def update_time_series(VI):
+def update_VI_type(VI):
     # Read and subset the dataframe
-    upper = VI + '_LOWER'
-    lower = VI + '_UPPER'
-    data_vi = bandwidth_vi_data[['date', VI, lower, upper]]
-    #print(bandwidth_vi_data.head(3))
+    if VI == "None":
+        upper = 'NDVI_LOWER'
+        lower = 'NDVI_UPPER'
+        data_vi = bandwidth_vi_data[['date', 'NDVI', lower, upper]]
+        VI = 'NDVI'
+    else:
+        upper = VI + '_LOWER'
+        lower = VI + '_UPPER'
+        data_vi = bandwidth_vi_data[['date', VI, lower, upper]]
 
     # Create time_series figures
     fig = go.Figure([
@@ -195,7 +208,7 @@ def update_time_series(VI):
                                     y=data_vi[VI],
                                     line=dict(color='rgb(0,100,80)'),
                                     mode='lines'
-                                  ),
+                                ),
                         go.Scatter(
                                     name='Upper Bound',
                                     x=data_vi['date'],
@@ -224,31 +237,16 @@ def update_time_series(VI):
                         xaxis_title= 'Date',
                         hovermode="x",
                         autosize=True) 
-    return fig
+    return fig, create_stl_img(VI)
 
-#Callback
-@app.callback(
-    Output(component_id='map-chart', component_property='figure'),
-    Input(component_id='field_selection', component_property='value')
-)
+# Callback
+# @app.callback(
+#     #Output(component_id='map-chart', component_property='figure'),
+#     Input(component_id='field_selection', component_property='value')
+# )
 
-def update_field(field): 
-    return create_stl_img(field)
-    # if field == 'Field_1':
-    #     img = io.imread(img_file_name)
-    #     title = 'The date this image was captured: xx/xx/xx'
-    #     map_fig = px.imshow(img, title = title)
-    #     map_fig.update_xaxes(showticklabels=False)
-    #     map_fig.update_yaxes(showticklabels=False)
-    #     map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
-
-    # else:
-    #     #mask_path = os.path.join(static_img_path, 'masks', 'data/masks/mask-x7168-y10240.png')
-    #     #img = io.imread(mask_path)
-    #     #img = plt.imshow(create_rasters())
-    #     img = create_rasters()
-    #     map_fig = plt.imshow(img)
-    # return map_fig
+# def update_field(field): 
+#     #return create_stl_img(field)
 
 '''
 https://plotly.com/python/shapes/
