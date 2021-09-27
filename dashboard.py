@@ -5,10 +5,10 @@ import os
 from PIL import Image
 from plotly.tools import mpl_to_plotly
 import matplotlib.pyplot as plt
-# from dash import dcc
-# from dash import html
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
+# import dash_core_components as dcc
+# import dash_html_components as html
 from dash.dependencies import Input, Output
 import boto3
 from skimage import io
@@ -41,7 +41,7 @@ app = dash.Dash(__name__)
 # Draw the satellite background
 def create_stl_img(field_no):
     title = 'The date this image was captured: xx/xx/xx'
-    if field_no == 'Field_2':
+    if field_no == 'Field_1':
         img = io.imread(img_file_name)
         print("img 1")
         print(type(img))
@@ -52,11 +52,12 @@ def create_stl_img(field_no):
         # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
     else:
         img = create_rasters()
-        print("img 2")
+        # print("img 2")
+        # img = io.imread('NDVI.png')
         image2 = imageio.core.util.Array(img)
         map_fig = px.imshow(image2)
-        print(type(image2))
-        print(image2)
+        # print(type(image2))
+        # print(image2)
         #map_fig = plt.figure()
         #map_fig = map_fig.add_subplot(img)
         #map_fig = mpl_to_plotly(map_fig)
@@ -109,7 +110,7 @@ time_scrub = dcc.Slider(
 
 map = dcc.Graph(
     id = 'map-chart', 
-    figure = create_stl_img('Field_1'), 
+    figure = create_stl_img('Field_2'), 
     style = {'height':'100%', 'width':'100%'},
     config={'displayModeBar': False},
     )
@@ -232,7 +233,7 @@ def update_time_series(VI):
 )
 
 def update_field(field): 
-    create_stl_img(field)
+    return create_stl_img(field)
     # if field == 'Field_1':
     #     img = io.imread(img_file_name)
     #     title = 'The date this image was captured: xx/xx/xx'
