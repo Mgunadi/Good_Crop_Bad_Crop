@@ -67,7 +67,8 @@ def generate_field_rasters():
         gndvi = calculate_gndvi(nir, green)
         endvi = calculate_endvi(nir, green, blue)
 
-        raster_types = ['ndvi', 'gndvi', 'endvi']
+
+        raster_types = ['ndvi', 'gndvi', 'endvi','savi']
         # replace ndvi! with the variable name corresponding to your VI timeseries
         for ras_type in raster_types:
             save_path = f'data/raster/{ras_type}-{field}.png'

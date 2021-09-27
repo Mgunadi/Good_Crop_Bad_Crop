@@ -5,10 +5,10 @@ import os
 from PIL import Image
 from plotly.tools import mpl_to_plotly
 import matplotlib.pyplot as plt
-#from dash import dcc
-#from dash import html
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
+# import dash_core_components as dcc
+# import dash_html_components as html
 from dash.dependencies import Input, Output
 import boto3
 from skimage import io
@@ -31,7 +31,7 @@ data_file_name = os.path.join(data_path, 'result-7680x-10240y')
 img_file_name = os.path.join(data_path,'timeseries', '7680-10240-TCI-2019-08-09.png')
 
 # Read the binary datafile
-bandwidth_vi_data = pd.read_feather(data_file_name)
+# bandwidth_vi_data = pd.read_feather(data_file_name)
 
 
 
@@ -39,63 +39,73 @@ bandwidth_vi_data = pd.read_feather(data_file_name)
 app = dash.Dash(__name__)
 
 # Draw the satellite background
-def create_stl_img(VI_type):
+def create_stl_img(VI_type, field):
     title = 'The date this image was captured: xx/xx/xx'
-    if VI_type == 'NDVI':
-        img = io.imread('NDVI.png')
-        map_fig = px.imshow(img)
-    elif VI_type == 'GNDVI':
-        #img = create_rasters()
-        # print("img 2")
-        img = io.imread('GNDVI.png')
-        #image2 = imageio.core.util.Array(img)
-        map_fig = px.imshow(img)
-        # print(type(image2))
-        # print(image2)
-        #map_fig = plt.figure()
-        #map_fig = map_fig.add_subplot(img)
-        #map_fig = mpl_to_plotly(map_fig)
-        #map_fig.add_trace(px.imshow(img).img[0])
-        # map_fig.update_xaxes(showticklabels=False)
-        # map_fig.update_yaxes(showticklabels=False)
-        # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
-    elif VI_type == 'SAVI':
-        img = io.imread('ENDVI.png')
-        map_fig = px.imshow(img)
-    else:
-        img = io.imread(img_file_name)
-        print("img 1")
-        print(type(img))
-        print(img)
-        map_fig = px.imshow(img)
-        # map_fig.update_xaxes(showticklabels=False)
-        # map_fig.update_yaxes(showticklabels=False)
-        # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
+    # if VI_type == 'NDVI':
+    #     img = io.imread('NDVI.png')
+    #     map_fig = px.imshow(img)
+    # elif VI_type == 'GNDVI':
+    #     #img = create_rasters()
+    #     # print("img 2")
+    #     img = io.imread('GNDVI.png')
+    #     #image2 = imageio.core.util.Array(img)
+    #     map_fig = px.imshow(img)
+    #     # print(type(image2))
+    #     # print(image2)
+    #     #map_fig = plt.figure()
+    #     #map_fig = map_fig.add_subplot(img)
+    #     #map_fig = mpl_to_plotly(map_fig)
+    #     #map_fig.add_trace(px.imshow(img).img[0])
+    #     # map_fig.update_xaxes(showticklabels=False)
+    #     # map_fig.update_yaxes(showticklabels=False)
+    #     # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
+    # elif VI_type == 'SAVI':
+    #     img = io.imread('ENDVI.png')
+    #     map_fig = px.imshow(img)
+    # else:
+    #     img = io.imread(img_file_name)
+    #     # print("img 1")
+    #     # print(type(img))
+    #     # print(img)
+    #     map_fig = px.imshow(img)
+    #     # map_fig.update_xaxes(showticklabels=False)
+    #     # map_fig.update_yaxes(showticklabels=False)
+    #     # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
+    file_name = f'{VI_type}-{field}.png'
+    img_path = os.path.join(data_path, 'raster', file_name) 
+    img = io.imread(img_path)
+    map_fig = px.imshow(img)
     return map_fig
 
 
 # UI components
 vi_radio = dcc.RadioItems(
     options=[
-        {'label': 'Base map', 'value': 'None'},
-        {'label': 'Normalized Difference Vegetation Index', 'value': 'NDVI'},
-        {'label': 'Green Normalized Difference Vegetation Index', 'value': 'GNDVI'},
-        {'label': 'Soil Adjusted Vegetation Index', 'value': 'SAVI'}
+        {'label': 'Base map', 'value': 'ndvi'},
+        {'label': 'Normalized Difference Vegetation Index', 'value': 'endvi'},
+        {'label': 'Green Normalized Difference Vegetation Index', 'value': 'gndvi'},
+        {'label': 'Soil Adjusted Vegetation Index', 'value': 'savi'}
     ],
     labelStyle={'display': 'flex', 
                 'color': 'white'},
-    value='None',
+    value='ndvi',
     id='vi--radio'
     )  
 
 field_selection = dcc.Dropdown(
     id='field_selection',
     options=[
-        {'label': 'Field 1', 'value': 'Field_1'},
-        {'label': 'Field 2', 'value': 'Field_2'},
-        {'label': 'Field 3', 'value': 'Field_3'}
-            ],
-    value='Field_1'
+        {'label': 'Field 1', 'value': '1'},
+        {'label': 'Field 2', 'value': '2'},
+        {'label': 'Field 3', 'value': '3'},
+        {'label': 'Field 4', 'value': '4'},
+        {'label': 'Field 5', 'value': '5'},
+        {'label': 'Field 6', 'value': '6'},
+        {'label': 'Field 7', 'value': '7'},
+        {'label': 'Field 8', 'value': '8'},
+        {'label': 'Field 9', 'value': '9'}
+    ],
+    value='1'
 )
 
 time_scrub = dcc.Slider(
@@ -116,7 +126,7 @@ time_scrub = dcc.Slider(
 
 map = dcc.Graph(
     id = 'map-chart', 
-    figure = create_stl_img('Default'), 
+    figure = create_stl_img('endvi','1'), 
     style = {'height':'100%', 'width':'100%'},
     config={'displayModeBar': False},
     )
@@ -187,25 +197,27 @@ app.layout = html.Div(id='container',
     Output(component_id='vi--chart', component_property='figure'),
     Output(component_id='map-chart', component_property='figure'),
     Input(component_id='vi--radio', component_property='value'),
+    Input(component_id='field_selection', component_property='value'),
 )
-def update_VI_type(VI):
+# THIS IS MY GUEST FOR THE 2ND 
+# ADD ANOTHER PARAMETER FOR THE FIELD
+def update_VI_type(VI, f):
+    # BASED ON THE 2 INPUT GIVE THE PROPER OUTPUT OF MAP AND 
     # Read and subset the dataframe
-    if VI == "None":
-        upper = 'NDVI_LOWER'
-        lower = 'NDVI_UPPER'
-        data_vi = bandwidth_vi_data[['date', 'NDVI', lower, upper]]
-        VI = 'NDVI'
-    else:
-        upper = VI + '_LOWER'
-        lower = VI + '_UPPER'
-        data_vi = bandwidth_vi_data[['date', VI, lower, upper]]
+    file_name = f'result-7680x-10240y-{f}'
+    result_path = os.path.join(data_path, 'result', file_name)
+    bandwidth_vi_data = pd.read_feather(result_path)
+    temp = VI.upper()
+    upper = temp + '_LOWER'
+    lower = temp + '_UPPER'
+    data_vi = bandwidth_vi_data[['date', temp, lower, upper]]
 
     # Create time_series figures
     fig = go.Figure([
                         go.Scatter( 
-                                    name=f'Average {VI} - all pixels',
+                                    name=f'Average {temp} - all pixels',
                                     x=data_vi['date'],
-                                    y=data_vi[VI],
+                                    y=data_vi[temp],
                                     line=dict(color='rgb(0,100,80)'),
                                     mode='lines'
                                 ),
@@ -231,13 +243,13 @@ def update_VI_type(VI):
                                 )
                     ])
     fig.update_layout(  
-                        title= f'<b>{VI} Time Series of selected region<b>',
+                        title= f'<b>{temp} Time Series of selected region<b>',
                         title_x=0.5,
                         yaxis_title=VI,
                         xaxis_title= 'Date',
                         hovermode="x",
                         autosize=True) 
-    return fig, create_stl_img(VI)
+    return fig, create_stl_img(VI, f)
 
 # Callback
 # @app.callback(
