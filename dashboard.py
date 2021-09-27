@@ -1,11 +1,13 @@
+from posixpath import join
 import dash
 import pandas as pd
 import numpy as np
+import os
 from PIL import Image
-#from dash import dcc
-#from dash import html
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
+# import dash_core_components as dcc
+# import dash_html_components as html
 from dash.dependencies import Input, Output
 import boto3
 from skimage import color, io
@@ -17,18 +19,23 @@ import pandas as pd
 # S3 import implementation for Satellite image
 s3 = boto3.resource('s3')
 BUCKET_NAME = 'goodcropbadcrop'
-KEY = 'satellite-data/phase-01/data/sentinel-2a-tile-7680x-10240y/timeseries/7680-10240-TCI-2019-08-09.png'
+KEY = 'data/timeseries/7680-10240-TCI-2019-08-09.png'
 # Outputs image file to current directory
 # s3.Bucket(BUCKET_NAME).download_file(KEY, 'current_satellite_image.jpg')
 
+data_path = os.path.join(os.getcwd(), 'data')
+static_img_path = os.path.join(os.getcwd(), 'assets')
+data_file_name = os.path.join(data_path, 'result-7680x-10240y')
+img_file_name = os.path.join(data_path,'timeseries', '7680-10240-TCI-2019-08-09.png')
+
 # Read the binary datafile
-bandwidth_vi_data = pd.read_feather('C:\\Users\\Gladiator\\Documents\\Good_Crop_Bad_Crop\\dashboardv3\\data\\result-7680x-10240y')
+bandwidth_vi_data = pd.read_feather(data_file_name)
 
 # Instantiating the Dashboard Application
 app = dash.Dash(__name__)
 
 title = 'The date this image was captured: xx/xx/xx'
-img = io.imread('data\\current_satellite_image.jpg')
+img = io.imread(img_file_name)
 map_fig = px.imshow(img)
 map_fig.update_xaxes(showticklabels=False)
 map_fig.update_yaxes(showticklabels=False)
@@ -107,7 +114,7 @@ app.layout = html.Div(id='container',
                                 html.Div(id= 'header2',
                                          children = [ 
                                                     html.H2('Predicting sugarcane health near Prosperine, Queensland'),
-                                                    html.Img(src='assets\\sugarcane.png', style={'align': 'right'})
+                                                    html.Img(src= os.path.join('assets','sugarcane.png'), style={'align': 'right'})
                                                     ]
                                         ),
                                 html.Div(id = 'sidebar', 
@@ -197,11 +204,13 @@ def update_time_series(VI):
     Output(component_id='map-chart', component_property='figure'),
     Input(component_id='field_selection', component_property='value')
 )
+
 def update_field(field): 
     if field == 'Field_1':
-        img = io.imread('data\\current_satellite_image.jpg')
+        img = io.imread(img_file_name)
     else:
-        img = io.imread('data\\masked_region.png')
+        mask_path = os.path.join(static_img_path, 'masks', 'data/masks/mask-x7168-y10240.png')
+        img = io.imread(mask_path)
 
     title = 'The date this image was captured: xx/xx/xx'
     map_fig = px.imshow(img)
