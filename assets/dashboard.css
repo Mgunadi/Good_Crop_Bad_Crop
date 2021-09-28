@@ -22,7 +22,7 @@ p {
 #container {
     display: grid;
     grid-template-columns: 40% 1fr;
-    grid-template-rows: 10% 1fr 1fr 35%;
+    grid-template-rows: 15% 1fr 12% 38%;
     padding: 0 120px;
     height: 100vh;
     color: black;
@@ -43,14 +43,19 @@ p {
 
 #header2 {
     padding-top: 5%;
-    padding-left: 12%;
-    display: grid;
+    display: flex;
     flex-direction: row;
+    grid-template-columns: 80% 1fr;
     /* justify-content: space-around; */
-    /* justify-content: left; */
+    justify-content: bottom; 
     align-items: baseline;
     grid-column: 2/4;
     background-color: rgb(55, 36, 163);
+}
+
+#header2 > Div{
+    text-align: left;
+    padding-left: 15%;
 }
 
 #sidebar {

@@ -1,19 +1,21 @@
-from posixpath import join
 import dash
 import pandas as pd
 import numpy as np
 import os
 from PIL import Image
+from plotly.tools import mpl_to_plotly
+import matplotlib.pyplot as plt
 from dash import dcc
 from dash import html
 # import dash_core_components as dcc
 # import dash_html_components as html
 from dash.dependencies import Input, Output
 import boto3
-from skimage import color, io
+from skimage import io
 import plotly.express as px
 import plotly.graph_objects as go
-import pandas as pd
+from create_rasters import create_rasters
+import imageio
 
 
 # S3 import implementation for Satellite image
@@ -29,40 +31,81 @@ data_file_name = os.path.join(data_path, 'result-7680x-10240y')
 img_file_name = os.path.join(data_path,'timeseries', '7680-10240-TCI-2019-08-09.png')
 
 # Read the binary datafile
-bandwidth_vi_data = pd.read_feather(data_file_name)
+# bandwidth_vi_data = pd.read_feather(data_file_name)
+
+
 
 # Instantiating the Dashboard Application
 app = dash.Dash(__name__)
 
-title = 'The date this image was captured: xx/xx/xx'
-img = io.imread(img_file_name)
-map_fig = px.imshow(img)
-map_fig.update_xaxes(showticklabels=False)
-map_fig.update_yaxes(showticklabels=False)
-map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
+# Draw the satellite background
+def create_stl_img(VI_type, field):
+    title = 'The date this image was captured: xx/xx/xx'
+    # if VI_type == 'NDVI':
+    #     img = io.imread('NDVI.png')
+    #     map_fig = px.imshow(img)
+    # elif VI_type == 'GNDVI':
+    #     #img = create_rasters()
+    #     # print("img 2")
+    #     img = io.imread('GNDVI.png')
+    #     #image2 = imageio.core.util.Array(img)
+    #     map_fig = px.imshow(img)
+    #     # print(type(image2))
+    #     # print(image2)
+    #     #map_fig = plt.figure()
+    #     #map_fig = map_fig.add_subplot(img)
+    #     #map_fig = mpl_to_plotly(map_fig)
+    #     #map_fig.add_trace(px.imshow(img).img[0])
+    #     # map_fig.update_xaxes(showticklabels=False)
+    #     # map_fig.update_yaxes(showticklabels=False)
+    #     # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
+    # elif VI_type == 'SAVI':
+    #     img = io.imread('ENDVI.png')
+    #     map_fig = px.imshow(img)
+    # else:
+    #     img = io.imread(img_file_name)
+    #     # print("img 1")
+    #     # print(type(img))
+    #     # print(img)
+    #     map_fig = px.imshow(img)
+    #     # map_fig.update_xaxes(showticklabels=False)
+    #     # map_fig.update_yaxes(showticklabels=False)
+    #     # map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
+    file_name = f'{VI_type}-{field}.png'
+    img_path = os.path.join(data_path, 'raster', file_name) 
+    img = io.imread(img_path)
+    map_fig = px.imshow(img)
+    return map_fig
 
 
 # UI components
 vi_radio = dcc.RadioItems(
     options=[
-        {'label': 'Normalized Difference Vegetation Index', 'value': 'NDVI'},
-        {'label': 'Green Normalized Difference Vegetation Index', 'value': 'GNDVI'},
-        {'label': 'Ssoil Adjusted Vegetation Index', 'value': 'SAVI'}
+        {'label': 'Base map', 'value': 'ndvi'},
+        {'label': 'Normalized Difference Vegetation Index', 'value': 'endvi'},
+        {'label': 'Green Normalized Difference Vegetation Index', 'value': 'gndvi'},
+        {'label': 'Soil Adjusted Vegetation Index', 'value': 'savi'}
     ],
     labelStyle={'display': 'flex', 
                 'color': 'white'},
-    value='NDVI',
-    id= 'vi--radio'
+    value='ndvi',
+    id='vi--radio'
     )  
 
 field_selection = dcc.Dropdown(
     id='field_selection',
     options=[
-        {'label': 'Field 1', 'value': 'Field_1'},
-        {'label': 'Field 2', 'value': 'Field_2'},
-        {'label': 'Field 3', 'value': 'Field_3'}
-            ],
-    value='Field_1'
+        {'label': 'Field 1', 'value': '1'},
+        {'label': 'Field 2', 'value': '2'},
+        {'label': 'Field 3', 'value': '3'},
+        {'label': 'Field 4', 'value': '4'},
+        {'label': 'Field 5', 'value': '5'},
+        {'label': 'Field 6', 'value': '6'},
+        {'label': 'Field 7', 'value': '7'},
+        {'label': 'Field 8', 'value': '8'},
+        {'label': 'Field 9', 'value': '9'}
+    ],
+    value='1'
 )
 
 time_scrub = dcc.Slider(
@@ -83,7 +126,7 @@ time_scrub = dcc.Slider(
 
 map = dcc.Graph(
     id = 'map-chart', 
-    figure = map_fig, 
+    figure = create_stl_img('endvi','1'), 
     style = {'height':'100%', 'width':'100%'},
     config={'displayModeBar': False},
     )
@@ -113,8 +156,8 @@ app.layout = html.Div(id='container',
                                         ),
                                 html.Div(id= 'header2',
                                          children = [ 
-                                                    html.H2('Predicting sugarcane health near Prosperine, Queensland'),
-                                                    html.Img(src= os.path.join('assets','sugarcane.png'), style={'align': 'right'})
+                                                        html.Div(html.H2('Predicting sugarcane health near Proserpine, Queensland')),
+                                                        html.Div(html.Img(src= os.path.join('assets','sugarcane.png'), style={'align': 'right'}))
                                                     ]
                                         ),
                                 html.Div(id = 'sidebar', 
@@ -137,7 +180,8 @@ app.layout = html.Div(id='container',
                                                     time_scrub,  
                                                 ],
                                         ),
-                                html.Div('Crop health: Good', style={'font-size': '200'}, className='Panel1'),
+                                html.Div(
+                                    html.P('Crop health: Good',), style={'font-size': '200'}, className='Panel1'),
                                 html.Div(id = 'map', 
                                         children = [map],
                                         style= {'background-color': 'rgb(5, 4, 37)'}
@@ -151,24 +195,32 @@ app.layout = html.Div(id='container',
 #Callback
 @app.callback(
     Output(component_id='vi--chart', component_property='figure'),
+    Output(component_id='map-chart', component_property='figure'),
     Input(component_id='vi--radio', component_property='value'),
+    Input(component_id='field_selection', component_property='value'),
 )
-def update_time_series(VI):
+# THIS IS MY GUEST FOR THE 2ND 
+# ADD ANOTHER PARAMETER FOR THE FIELD
+def update_VI_type(VI, f):
+    # BASED ON THE 2 INPUT GIVE THE PROPER OUTPUT OF MAP AND 
     # Read and subset the dataframe
-    upper = VI + '_LOWER'
-    lower = VI + '_UPPER'
-    data_vi = bandwidth_vi_data[['date', VI, lower, upper]]
-    #print(bandwidth_vi_data.head(3))
+    file_name = f'result-7680x-10240y-{f}'
+    result_path = os.path.join(data_path, 'result', file_name)
+    bandwidth_vi_data = pd.read_feather(result_path)
+    temp = VI.upper()
+    upper = temp + '_LOWER'
+    lower = temp + '_UPPER'
+    data_vi = bandwidth_vi_data[['date', temp, lower, upper]]
 
     # Create time_series figures
     fig = go.Figure([
                         go.Scatter( 
-                                    name=f'Average {VI} - all pixels',
+                                    name=f'Average {temp} - all pixels',
                                     x=data_vi['date'],
-                                    y=data_vi[VI],
+                                    y=data_vi[temp],
                                     line=dict(color='rgb(0,100,80)'),
                                     mode='lines'
-                                  ),
+                                ),
                         go.Scatter(
                                     name='Upper Bound',
                                     x=data_vi['date'],
@@ -191,34 +243,22 @@ def update_time_series(VI):
                                 )
                     ])
     fig.update_layout(  
-                        title= f'<b>{VI} Time Series of selected region<b>',
+                        title= f'<b>{temp} Time Series of selected region<b>',
                         title_x=0.5,
                         yaxis_title=VI,
                         xaxis_title= 'Date',
                         hovermode="x",
                         autosize=True) 
-    return fig
+    return fig, create_stl_img(VI, f)
 
-#Callback
-@app.callback(
-    Output(component_id='map-chart', component_property='figure'),
-    Input(component_id='field_selection', component_property='value')
-)
+# Callback
+# @app.callback(
+#     #Output(component_id='map-chart', component_property='figure'),
+#     Input(component_id='field_selection', component_property='value')
+# )
 
-def update_field(field): 
-    if field == 'Field_1':
-        img = io.imread(img_file_name)
-    else:
-        mask_path = os.path.join(static_img_path, 'masks', 'data/masks/mask-x7168-y10240.png')
-        img = io.imread(mask_path)
-
-    title = 'The date this image was captured: xx/xx/xx'
-    map_fig = px.imshow(img)
-    map_fig.update_xaxes(showticklabels=False)
-    map_fig.update_yaxes(showticklabels=False)
-    map_fig.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, t=0))
-    
-    return map_fig
+# def update_field(field): 
+#     #return create_stl_img(field)
 
 '''
 https://plotly.com/python/shapes/
