@@ -125,6 +125,9 @@ def calculate_gndvi(NIR, GREEN):
 def calculate_endvi(NIR, GREEN, BLUE):
     return ((NIR + GREEN) - (2 * BLUE)) / ((NIR + GREEN) + (2 * BLUE)) 
 
+def calculate_savi(NIR, RED, L):
+    return (NIR - RED) / (NIR + RED + L) * (1+L)
+
 
 # create a masked raster image based on a vegetation index
 def create_vi_raster(mask, vi):
